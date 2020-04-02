@@ -16,7 +16,7 @@ CUSTOM_PARAMETERS=$3
 if [[ $AUTOPROV_ACTION == delete ]]
 then
 
-	log "Connection to API server"
+	echo "Connection to API server"
 	SID=$(mgmt_cli -r true login -f json | jq -r '.sid')
 	GW_JSON=$(mgmt_cli --session-id $SID show simple-gateway name $GW_NAME -f json)
 	GW_UID=$(echo $GW_JSON | jq '.uid')
@@ -27,7 +27,7 @@ then
 		REMOTE_ACCESS_UID=$(mgmt_cli --session-id $SID show-generic-objects name "RemoteAccess" -f json | jq '.objects[].uid')
 		mgmt_cli --session-id $SID set generic-object uid $REMOTE_ACCESS_UID participantGateways.remove $GW_UID
 		
-	log "Publishing changes"
+	echo "Publishing changes"
 		mgmt_cli publish --session-id $SID
 		
 		exit 0
@@ -66,13 +66,13 @@ if [[ $AUTOPROV_ACTION == add ]]
 then
 		
         echo "Finding the RemoteAccess UID"
-	    REMOTE_ACCESS_UID=$(mgmt_cli --session-id $SID show-generic-objects name "RemoteAccess" -f json | jq '.objects[].uid')
+	    	REMOTE_ACCESS_UID=$(mgmt_cli --session-id $SID show-generic-objects name "RemoteAccess" -f json | jq '.objects[].uid')
  		
 		echo "Adding $GW_NAME to Remote Access Community"
 		mgmt_cli --session-id $SID set generic-object uid $REMOTE_ACCESS_UID participantGateways.add $GW_UID               
         
 		echo "Set VPN Static NAT to $GW_ETH0_IP"
-        mgmt_cli --session-id $SID set-generic-object uid $GW_UID vpn.singleVpnIp $GW_ETH0_IP vpn.ipResolutionMechanismGw "SINGLENATIPVPN" vpn.useCert "defaultCert" vpn.useClientlessVpn true
+        	mgmt_cli --session-id $SID set-generic-object uid $GW_UID vpn.singleVpnIp $GW_ETH0_IP vpn.ipResolutionMechanismGw "SINGLENATIPVPN" vpn.useCert "defaultCert" vpn.useClientlessVpn true
 	
 		log "Activating syncWebUiPortWithGwFlag on $GW_NAME" 
 		mgmt_cli --session-id $SID set generic-object uid $GW_UID syncWebUiPortWithGwFlag true
@@ -93,9 +93,8 @@ then
 
 		echo "Creating VPNSNX portal on $GW_NAME" 
 		mgmt_cli --session-id $SID set generic-object uid $GW_UID portals.add.create "com.checkpoint.objects.classes.dummy.CpmiPortalSettings" portals.add.owned-object.portalName "\"VPN_SNX\""
-		#SNX_PORTAL_ID=$(mgmt_cli --session-id $SID show generic-object uid $GW_UID --format json | jq -r '.portals[3].objId')
 		echo "Checking to see if SNX portal is already created"
-        SNX_PORTAL_ID=$(mgmt_cli --session-id $SID show-generic-object uid $GW_UID --format json | jq -r '.portals[] | select(.portalName=="VPN_SNX") | .objId')
+        	SNX_PORTAL_ID=$(mgmt_cli --session-id $SID show-generic-object uid $GW_UID --format json | jq -r '.portals[] | select(.portalName=="VPN_SNX") | .objId')
 		
 		echo "Setting client portal access on all interfaces on $GW_NAME" 
 		mgmt_cli --session-id $SID set generic-object uid $GW_UID portals.set.uid $SNX_PORTAL_ID portals.set.owned-object.portalAccess "ALL_INTERFACES"
@@ -111,7 +110,6 @@ then
 
 		echo "Creating CSHELL portal on $GW_NAME" 
 		mgmt_cli --session-id $SID set generic-object uid $GW_UID portals.add.create "com.checkpoint.objects.classes.dummy.CpmiPortalSettings" portals.add.owned-object.portalName "\"CSHELL\""
-		#CSHELL_PORTAL_ID=$(mgmt_cli --session-id $SID show generic-object uid $GW_UID --format json | jq -r '.portals[4].objId')
 		echo "Checking to see if CSHELL portal is already created"
 		CSHELL_PORTAL_ID=$(mgmt_cli --session-id $SID show-generic-object uid $GW_UID --format json | jq -r '.portals[] | select(.portalName=="CSHELL") | .objId')
 		
@@ -129,7 +127,6 @@ then
 
 		echo "Creating CLIENTS portal on $GW_NAME" 
 		mgmt_cli --session-id $SID set generic-object uid $GW_UID portals.add.create "com.checkpoint.objects.classes.dummy.CpmiPortalSettings" portals.add.owned-object.portalName "\"clients\""
-		#CLIENTS_PORTAL_ID=$(mgmt_cli --session-id $SID show generic-object uid $GW_UID --format json | jq -r '.portals[5].objId')
 		echo "Checking to see if CLIENTS portal is already created"
 		CLIENTS_PORTAL_ID=$(mgmt_cli --session-id $SID show-generic-object uid $GW_UID --format json | jq -r '.portals[] | select(.portalName=="clients") | .objId')
 		
@@ -179,13 +176,13 @@ then
 		mgmt_cli --session-id $SID set-generic-object uid $GW_UID realmsForBlades.add.create "com.checkpoint.objects.classes.dummy.CpmiRealmBladeEntry" realmsForBlades.add.owned-object.ownedName "active_sync_realm" realmsForBlades.add.owned-object.displayString "active_sync_realm" realmsForBlades.add.owned-object.requirePasswordInFirstChallenge false realmsForBlades.add.owned-object.authentication.authSchemes.add.create "com.checkpoint.objects.realms_schema.dummy.CpmiRealmAuthScheme" realmsForBlades.add.owned-object.authentication.authSchemes.add.owned-object.authScheme "USER_PASS"
 		mgmt_cli --session-id $SID set-generic-object uid $GW_UID realmsForBlades.add.create "com.checkpoint.objects.classes.dummy.CpmiRealmBladeEntry" realmsForBlades.add.owned-object.ownedName "mobile_android_bc" realmsForBlades.add.owned-object.displayString "mobile_android_bc" realmsForBlades.add.owned-object.requirePasswordInFirstChallenge false realmsForBlades.add.owned-object.authentication.authSchemes.add.create "com.checkpoint.objects.realms_schema.dummy.CpmiRealmAuthScheme" realmsForBlades.add.owned-object.authentication.authSchemes.add.owned-object.authScheme "USER_PASS"
 		
-		log "Publishing 1st changes"
+		echo "Publishing 1st changes"
 		mgmt_cli publish --session-id $SID
 		
 		echo "Change color"
 		mgmt_cli --session-id $SID set simple-gateway uid $GW_UID color pink
 		
-		log "Publishing 2nd changes"
+		echo "Publishing 2nd changes"
 		mgmt_cli publish --session-id $SID		
       
 		log "Start Install Policy"
@@ -195,17 +192,15 @@ then
 		INSTALL_STATUS=$?
 		done
 		
-		log "Policy Installed" 
+		log "Policy Installed"
 
-                log "Logging out of session"
-                mgmt_cli logout --session-id $SID
 fi
 	
 log "Logout from API server"
 mgmt_cli --session-id $SID logout
 			
-log "***********************************************"
+echo "***********************************************"
 echo "END OF COMMAND: $AUTOPROV_ACTION for Gateway:$GW_NAME with $4"
-log "***********************************************"
+echo "***********************************************"
 
 exit 0
