@@ -20,6 +20,11 @@ then
 	SID=$(mgmt_cli -r true login -f json | jq -r '.sid')
 	GW_JSON=$(mgmt_cli --session-id $SID show simple-gateway name $GW_NAME -f json)
 	GW_UID=$(echo $GW_JSON | jq '.uid')
+	
+	echo "Activating MAB"
+	mgmt_cli --session-id $SID set generic-object uid $GW_UID connectra true
+	mgmt_cli --session-id $SID set-generic-object uid $GW_UID connectraSettings.enableMabApplicationInUnifiedPolicy true
+	
 	echo "Finding the RemoteAccess UID"
 	REMOTE_ACCESS_UID=$(mgmt_cli --session-id $SID show-generic-objects name "RemoteAccess" -f json | jq '.objects[].uid')
 
