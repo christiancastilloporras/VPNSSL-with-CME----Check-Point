@@ -74,7 +74,7 @@ then
 		echo "Set VPN Static NAT to $GW_ETH0_IP"
         mgmt_cli --session-id $SID set-generic-object uid $GW_UID vpn.singleVpnIp $GW_ETH0_IP vpn.ipResolutionMechanismGw "SINGLENATIPVPN" vpn.useCert "defaultCert" vpn.useClientlessVpn true
 	
-		log "Activating syncWebUiPortWithGwFlag on $GW_NAME" 
+		echo "Activating syncWebUiPortWithGwFlag on $GW_NAME" 
 		mgmt_cli --session-id $SID set generic-object uid $GW_UID syncWebUiPortWithGwFlag true
 					
 		echo "Configuration VPNDomain"
@@ -184,6 +184,8 @@ then
 		
 		echo "Change color"
 		mgmt_cli --session-id $SID set simple-gateway uid $GW_UID color pink
+		echo "HW Type" 
+		mgmt_cli --session-id $SID set generic-object uid $GW_UID applianceType "CloudGuard IaaS"
 		
 		log "Publishing 2nd changes"
 		mgmt_cli publish --session-id $SID		
@@ -241,6 +243,11 @@ then
 
         echo "Finding the RemoteAccess UID"
 	    REMOTE_ACCESS_UID=$(mgmt_cli --session-id $SID show-generic-objects name "RemoteAccess" -f json | jq '.objects[].uid')
+		
+		echo "Modifying SecurePlatform portal"
+		PORTALID=$(mgmt_cli -r true show generic-object uid $GW_UID --format json | jq '.portals[0].objId' | tr -d '"')
+		ORIGINALURL=$(mgmt_cli -r true show generic-object uid $GW_UID --format json | jq '.portals[0].mainUrl' | tr -d '"' | sed 's/.$//')
+		mgmt_cli --session-id $SID set generic-object uid $GW_UID portals.set.uid $PORTALID portals.set.owned-object.mainUrl "\"$ORIGINALURL:4434/\""
                 
         echo "Set VPN Static NAT to $GW_ETH0_IP"
         mgmt_cli --session-id $SID set-generic-object uid $GW_UID vpn.singleVpnIp $GW_ETH0_IP vpn.ipResolutionMechanismGw "SINGLENATIPVPN" 
