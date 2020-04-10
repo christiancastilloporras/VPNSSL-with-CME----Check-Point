@@ -237,6 +237,8 @@ then
 	
 		echo "Setting GW color on $GW_NAME" 
 		mgmt_cli --session-id $SID set simple-gateway uid $GW_UID color orange
+		echo "HW Type" 
+		mgmt_cli --session-id $SID set generic-object uid $GW_UID applianceType "CloudGuard IaaS"
 
         echo "Activating syncWebUiPortWithGwFlag on $GW_NAME" 
 		mgmt_cli --session-id $SID set generic-object uid $GW_UID syncWebUiPortWithGwFlag true
