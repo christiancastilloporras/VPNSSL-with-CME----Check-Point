@@ -12,6 +12,7 @@ Needs to be run in Autoprovision template with "ACTIVATESNXVPN" as a custom para
 AUTOPROV_ACTION=$1
 GW_NAME=$2
 CUSTOM_PARAMETERS=$3
+POLICY_PACKAGE_NAME=$4
 
 if [[ $AUTOPROV_ACTION == delete ]]
 then
@@ -56,7 +57,6 @@ GW_UID=$(echo $GW_JSON | jq '.uid')
 GW_ETH0_IP=$(echo $GW_JSON | jq -r '."ipv4-address"')
 OFFICE_MODE_POOL=$(mgmt_cli --session-id $SID show-network name CP_default_Office_Mode_addresses_pool -f json |jq '.uid')
 INSTALL_STATUS=1
-POLICY_PACKAGE_NAME="azureinbound-RB"
 ANY_UID=$(mgmt_cli --session-id $SID show-generic-objects name Any details-level full -f json | jq -r '.objects[] | select(.cpmiDisplayName=="Any") |.uid')
 
 if [[ $AUTOPROV_ACTION == add ]]
